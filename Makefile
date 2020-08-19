@@ -1,5 +1,5 @@
-FLAGS := -std=c99 -pedantic -Wall -Wextra -Wl, --allow-multiple-definition
-CFLAGS := ${FLAGS} -fPIC -Ofast -g -march=core2 -mtune=generic -lm
+FLAGS := -std=c99 -pedantic -Wall -Wextra
+CFLAGS := ${FLAGS} -fPIC
 LDFLAGS := ${CFLAGS} -shared
 
 SRC = ${wildcard src/*.c}
@@ -7,22 +7,18 @@ OBJ = ${SRC:.c=.o}
 
 all: a.out
 
-libradix.a:
-	cd libs/radix
-	make libradix.a
-	mv libradix.a ../..
-	cd ../..
+libs/radix/libradix.a: .gitmodules
+	${MAKE} libradix.a -C libs/radix
 
-libsurrender.a:
-	cd libs/surrender
-	./build_deps.sh
-	mv libsurrender.a ../..
-	cd ../..
+libs/surrender/libsurrender.a: .gitmodules
+	${MAKE} libsurrender.a -C libs/surrender
 
-a.out: main.c libsurrender.a libradix.a
+a.out: main.c libs/surrender/libsurrender.a libs/radix/libradix.a
 	${CC} $^ -lSDL2 ${CFLAGS}
 
 clean:
-	rm -f a.out lib*.* ${OBJ}
+	rm -f a.out ${OBJ}
+	${MAKE} clean -C libs/surrender
+	${MAKE} clean -C libs/radix
 
 .PHONY: all clean
