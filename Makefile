@@ -13,7 +13,7 @@ libs/radix/libradix.a: .gitmodules
 libs/surrender/libsurrender.a: .gitmodules
 	${MAKE} libsurrender.a -C libs/surrender
 
-a.out: main.c libs/surrender/libsurrender.a libs/radix/libradix.a
+a.out: ${OBJ} libs/surrender/libsurrender.a libs/radix/libradix.a
 	${CC} $^ -lSDL2 ${CFLAGS}
 
 clean:
