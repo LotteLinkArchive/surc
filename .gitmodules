@@ -1,6 +1,6 @@
-[submodule "surrender"]
-	path = libs/surrender
-	url = https://github.com/naphthasl/surrender
 [submodule "libs/radix"]
 	path = libs/radix
-	url = https://github.com/naphthasl/radix
+	url = https://git.lotte.link/naphtha/radix
+[submodule "libs/surrender"]
+	path = libs/surrender
+	url = https://git.lotte.link/naphtha/SurRender

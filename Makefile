@@ -7,10 +7,13 @@ OBJ = ${SRC:.c=.o}
 
 all: a.out
 
-libs/radix/libradix.a: .gitmodules
+update:
+	git submodule update --init --recursive
+
+libs/radix/libradix.a: update
 	${MAKE} libradix.a -C libs/radix
 
-libs/surrender/libsurrender.a: .gitmodules
+libs/surrender/libsurrender.a: update
 	${MAKE} libsurrender.a -C libs/surrender
 
 a.out: ${OBJ} libs/surrender/libsurrender.a libs/radix/libradix.a
