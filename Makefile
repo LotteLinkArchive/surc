@@ -1,5 +1,5 @@
 FLAGS := -std=c99 -pedantic -Wall -Wextra
-CFLAGS := ${FLAGS} -fPIC
+CFLAGS := ${FLAGS} -fPIC -g
 LDFLAGS := ${CFLAGS} -shared
 
 SRC = ${wildcard src/*.c}
@@ -14,7 +14,7 @@ libs/surrender/libsurrender.a: .gitmodules
 	${MAKE} libsurrender.a -C libs/surrender
 
 a.out: ${OBJ} libs/surrender/libsurrender.a libs/radix/libradix.a
-	${CC} $^ -lSDL2 ${CFLAGS}
+	${CC} $^ -lSDL2 -lm ${CFLAGS}
 
 clean:
 	rm -f a.out ${OBJ}
