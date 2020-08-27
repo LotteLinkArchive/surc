@@ -23,6 +23,11 @@ int surc_scene_new(struct SurcScene *const scene, const uint16_t width, const ui
 void surc_scene_load(struct SurcScene *const scene, const uint8_t *const map);
 
 /*
+ * Get map value
+ */
+uint8_t surc_scene_get_tile(struct SurcScene *const scene, const uint16_t x, const uint16_t y);
+
+/*
  * Frees the map of scene
  */
 void surc_scene_free(struct SurcScene *const scene);
