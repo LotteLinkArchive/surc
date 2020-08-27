@@ -13,7 +13,9 @@ init(SR_Canvas *canvas)
 	if (!SR_CanvasIsValid(&overlay))
 		return 1;
 
-	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width-1, overlay.height-1);
+	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width/2, overlay.height/2);
+
+	SR_MergeCanvasIntoCanvas(canvas, &overlay, 0, 0, 255, SR_BLEND_REPLACE);
 	return 0;
 }
 
@@ -21,6 +23,12 @@ int
 update(SR_Canvas *canvas)
 {
 	return 0;
+}
+
+void
+clean()
+{
+	SR_DestroyCanvas(&overlay);
 }
 
 int
@@ -57,6 +65,8 @@ main(int argc, char **argv)
 		goto sdl_destroywin;
 	}
 
+	SR_DrawRect(&canvas, SR_CreateRGBA(0, 0, 0, 255), 0, 0, canvas.width, canvas.height);
+
 	if (!(csurf = SDL_CreateRGBSurfaceFrom(
 		canvas.pixels,
 		canvas.width,
@@ -86,26 +96,28 @@ main(int argc, char **argv)
 event_loop:
 	while (SDL_PollEvent(&ev))
 		if (ev.type == SDL_QUIT)
-			goto sdl_freesurf;
+			goto surc_clean_mess;
 
 	/* Update code here */
 	if (update(&canvas)) {
 		status = 7;
-		goto sdl_freesurf;
+		goto surc_clean_mess;
 	}
 
 	if (SDL_BlitSurface(csurf, NULL, wsurf, NULL) < 0) {
 		status = 8;
-		goto sdl_freesurf;
+		goto surc_clean_mess;
 	}
 
 	if (SDL_UpdateWindowSurface(window) < 0) {
 		status = 9;
-		goto sdl_freesurf;
+		goto surc_clean_mess;
 	}
 
 	goto event_loop;
 
+surc_clean_mess:
+	clean();
 sdl_freesurf:
 	SDL_FreeSurface(csurf);
 sr_destroycanvas:
