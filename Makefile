@@ -24,4 +24,4 @@ clean:
 	${MAKE} clean -C libs/surrender
 	${MAKE} clean -C libs/radix
 
-.PHONY: all clean
+.PHONY: update all clean

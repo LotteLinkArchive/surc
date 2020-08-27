@@ -1,21 +1,26 @@
-#include <stdio.h>
-
 #include <SDL2/SDL.h>
 #include "../libs/surrender/src/surrender.h"
 
 #define WIDTH 640
 #define HEIGHT 480
 
-void
+SR_Canvas overlay;
+
+int
 init(SR_Canvas *canvas)
 {
+	overlay = SR_NewCanvas(canvas->width, canvas->height);
+	if (!SR_CanvasIsValid(&overlay))
+		return 1;
 
+	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width-1, overlay.height-1);
+	return 0;
 }
 
-void
+int
 update(SR_Canvas *canvas)
 {
-
+	return 0;
 }
 
 int
@@ -73,7 +78,10 @@ main(int argc, char **argv)
 	}
 
 	/* Allow one time init */
-	init(&canvas);
+	if (init(&canvas)) {
+		status = 6;
+		goto sdl_freesurf;
+	}
 
 event_loop:
 	while (SDL_PollEvent(&ev))
@@ -81,15 +89,18 @@ event_loop:
 			goto sdl_freesurf;
 
 	/* Update code here */
-	update(&canvas);
+	if (update(&canvas)) {
+		status = 7;
+		goto sdl_freesurf;
+	}
 
 	if (SDL_BlitSurface(csurf, NULL, wsurf, NULL) < 0) {
-		status = 6;
+		status = 8;
 		goto sdl_freesurf;
 	}
 
 	if (SDL_UpdateWindowSurface(window) < 0) {
-		status = 8;
+		status = 9;
 		goto sdl_freesurf;
 	}
 
