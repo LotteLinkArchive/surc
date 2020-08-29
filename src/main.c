@@ -10,7 +10,9 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
-#define CAMERA_SIZE 8
+#define CAMERA_SIZE 4
+#define DIR_VECTOR_LEN 10
+
 #define TILE_SIZE 64
 #define OVERLAY_TILE_SIZE 16
 
@@ -25,7 +27,7 @@ const uint8_t map[] = {
 };
 
 #define MOVE_SPEED 0.1
-#define ROT_SPEED 1
+#define ROT_SPEED 0.5
 
 SR_Canvas overlay; /* Overlay canvas to draw 2d representation */
 
@@ -37,6 +39,7 @@ updateOverlay(SR_Canvas *canvas)
 {
 	SR_RGBAPixel color;
 	uint8_t x, y;
+	struct SurcVect2f overlayPos;
 
 	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width, overlay.height);
 	for (y = 0; y < scene.height; ++y)
@@ -54,7 +57,11 @@ updateOverlay(SR_Canvas *canvas)
 	}
 
 	/* Camera */
-	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), (camera.pos.x - CAMERA_SIZE/2)*OVERLAY_TILE_SIZE, (camera.pos.y - CAMERA_SIZE/2)*OVERLAY_TILE_SIZE, CAMERA_SIZE/2, CAMERA_SIZE/2);
+	overlayPos.x = camera.pos.x*OVERLAY_TILE_SIZE;
+	overlayPos.y = camera.pos.y*OVERLAY_TILE_SIZE;
+
+	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), overlayPos.x - CAMERA_SIZE/2, overlayPos.y - CAMERA_SIZE/2, CAMERA_SIZE, CAMERA_SIZE);
+	SR_DrawLine(&overlay, SR_CreateRGBA(100, 0, 100, 255), overlayPos.x, overlayPos.y, overlayPos.x + camera.dir.x*DIR_VECTOR_LEN, overlayPos.y + camera.dir.y*DIR_VECTOR_LEN);
 
 	SR_MergeCanvasIntoCanvas(canvas, &overlay, 0, 0, 255, SR_BLEND_REPLACE);
 }
@@ -96,31 +103,29 @@ onKeyDown(SDL_KeyCode key)
 	float oldX;
 
 	/* Camera movement and rotation */
-	switch (key) {
-	case SDLK_UP:
+	if (key == SDLK_UP) {
 		camera.pos.x += camera.dir.x * MOVE_SPEED;
 		camera.pos.y += camera.dir.y * MOVE_SPEED;
-		break;
-	case SDLK_DOWN:
+	}
+	if (key == SDLK_DOWN) {
 		camera.pos.x -= camera.dir.x * MOVE_SPEED;
 		camera.pos.y -= camera.dir.y * MOVE_SPEED;
-		break;
-	case SDLK_LEFT:
+	}
+	if (key == SDLK_LEFT) {
 		oldX = camera.dir.x;
 		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
 		camera.dir.y = oldX*sinf(ROT_SPEED) + camera.dir.y*cosf(ROT_SPEED);
 		oldX = camera.cameraPlane.x;
 		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
 		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) + camera.cameraPlane.y*cosf(ROT_SPEED);
-		break;
-	case SDLK_RIGHT:
+	}
+	if (key == SDLK_RIGHT) {
 		oldX = camera.dir.x;
 		camera.dir.x = camera.dir.x*cosf(-ROT_SPEED) - camera.dir.y*sinf(-ROT_SPEED);
 		camera.dir.y = oldX*sinf(-ROT_SPEED) + camera.dir.y*cosf(-ROT_SPEED);
 		oldX = camera.cameraPlane.x;
 		camera.cameraPlane.x = camera.cameraPlane.x*cosf(-ROT_SPEED) - camera.cameraPlane.y*sinf(-ROT_SPEED);
 		camera.cameraPlane.y = oldX*sinf(-ROT_SPEED) + camera.cameraPlane.y*cosf(-ROT_SPEED);
-	default: break;
 	}
 
 	/* printf("x: %.2f y: %0.2f", camera.dir.x, camera.dir.y); */
