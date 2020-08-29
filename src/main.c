@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "../libs/surrender/src/surrender.h"
 
+#include "camera.h"
 #include "scene.h"
 
 #define WIDTH 1280
@@ -22,6 +23,7 @@ const uint8_t map[] = {
 
 SR_Canvas overlay; /* Overlay canvas to draw 2d representation */
 
+struct SurcCamera camera;
 struct SurcScene scene; /* Test scene */
 
 int
@@ -29,6 +31,8 @@ init(SR_Canvas *canvas)
 {
 	SR_RGBAPixel color;
 	uint8_t x, y;
+
+	camera.cameraPlane.y = 0.66f;
 
 	overlay = SR_NewCanvas(canvas->width, canvas->height);
 	if (!SR_CanvasIsValid(&overlay))
@@ -79,7 +83,7 @@ main(int argc, char **argv)
 
 	SDL_Surface *wsurf, *csurf;
 
-	int status;
+	int status = 0;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		status = 1;

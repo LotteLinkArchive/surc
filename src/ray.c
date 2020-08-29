@@ -1,34 +1,67 @@
 /*
  * The math for this is beautiful
  * Watch: https://www.youtube.com/watch?v=eOCQfxRQ2pY
- * Read: https://permadi.com/1996/05/ray-casting-tutorial-table-of-contents/
+ * Read: https://lodev.org/cgtutor/raycasting.html
  */
 #include <math.h>
 #include <stddef.h>
+#include <sys/types.h>
+#include "../libs/radix/src/radix.h"
 
 #include "camera.h"
 #include "ray.h"
 #include "scene.h"
 
 int
-surc_raycast_until_collision(const struct SurcVect2 *hit,
-                             const struct SurcCamera *const camera,
-                             const struct SurcScene *const scene)
+surc_raycast_until_collision(struct SurcVect2f *const hit,
+                             const struct SurcVect2f pos,
+                             const struct SurcVect2f rayDir,
+                             struct SurcScene *const scene)
 {
-	/* float offsetX, offsetY; /1* offset from absolute grid position *1/ */
-	/* float stepX, stepY; /1* step between each edge hit *1/ */
-	/* float interceptX, interceptY; /1* difference to first hit *1/ */
+	/* TODO: Bounds checks */
+	struct SurcVect2i map, step;
+	struct SurcVect2f sideDist, deltaDist;
 
-	/* /1* calculate offsets *1/ */
-	/* offsetX = modf(camera->pos.x, NULL); */
-	/* offsetY = modf(camera->pos.y, NULL); */
+	map.x = (int)pos.x;
+	map.y = (int)pos.y;
 
-	/* /1* steps *1/ */
-	/* stepX = tan(camera->yaw); */
-	/* stepY = atan(camera->yaw); */
+	/* Calculate deltas */
+	deltaDist.x = fabsf(1/rayDir.x);
+	deltaDist.y = fabsf(1/rayDir.y);
 
-	/* /1* intercepts *1/ */
-	/* interceptX = camera->pos.x - offsetY/tan(camera->yaw); */
-	/* interceptX = camera->pos.x + offsetX/tan(camera->yaw); */
-	return 0;
+	/* step and sideDists (offsets) */
+	if (rayDir.x < 0) {
+		step.x = -1;
+		sideDist.x = (pos.x - map.x)*deltaDist.x;
+	} else {
+		step.x = 1;
+		sideDist.x = (map.x + 1 - pos.x)*deltaDist.x;
+	}
+
+	if (rayDir.y < 0) {
+		step.y = -1;
+		sideDist.y = (pos.y - map.y)*deltaDist.y;
+	} else {
+		step.y = 1;
+		sideDist.y = (map.y + 1 - pos.y)*deltaDist.y;
+	}
+
+	/* DDA */
+	for (;;) {
+		if (sideDist.x < sideDist.y) {
+			sideDist.x += deltaDist.x;
+			map.x += step.x;
+		} else {
+			sideDist.y += deltaDist.y;
+			map.y += step.y;
+		}
+
+		if (surc_scene_get_tile(scene, map.x, map.y) > 0) {
+			hit->x = map.x;
+			hit->y = map.y;
+			return 0;
+		}
+	}
+
+	return 1;
 }
