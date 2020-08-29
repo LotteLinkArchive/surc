@@ -25,7 +25,7 @@ const uint8_t map[] = {
 };
 
 #define MOVE_SPEED 0.1
-#define ROT_SPEED 0.1
+#define ROT_SPEED 1
 
 SR_Canvas overlay; /* Overlay canvas to draw 2d representation */
 
@@ -67,7 +67,7 @@ init(SR_Canvas *canvas)
 	camera.pos.y = MAP_Y;
 	camera.dir.x = 1;
 	camera.cameraPlane.y = 0.66f;
-	camera.height = TILE_SIZE;
+	camera.height = TILE_SIZE/2;
 
 	if (!surc_scene_new(&scene, MAP_X, MAP_Y))
 		return 1;
@@ -107,23 +107,23 @@ onKeyDown(SDL_KeyCode key)
 		break;
 	case SDLK_LEFT:
 		oldX = camera.dir.x;
-		camera.dir.x = camera.dir.x*cosf(-ROT_SPEED) - camera.dir.y*sinf(-ROT_SPEED);
-		camera.dir.y = oldX*sinf(-ROT_SPEED) - camera.dir.y*cosf(-ROT_SPEED);
+		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
+		camera.dir.y = oldX*sinf(ROT_SPEED) + camera.dir.y*cosf(ROT_SPEED);
 		oldX = camera.cameraPlane.x;
-		camera.cameraPlane.x = camera.cameraPlane.x*cosf(-ROT_SPEED) - camera.cameraPlane.y*sinf(-ROT_SPEED);
-		camera.cameraPlane.y = oldX*sinf(-ROT_SPEED) - camera.cameraPlane.y*cosf(-ROT_SPEED);
+		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
+		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) + camera.cameraPlane.y*cosf(ROT_SPEED);
 		break;
 	case SDLK_RIGHT:
 		oldX = camera.dir.x;
-		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
-		camera.dir.y = oldX*sinf(ROT_SPEED) - camera.dir.y*cosf(ROT_SPEED);
+		camera.dir.x = camera.dir.x*cosf(-ROT_SPEED) - camera.dir.y*sinf(-ROT_SPEED);
+		camera.dir.y = oldX*sinf(-ROT_SPEED) + camera.dir.y*cosf(-ROT_SPEED);
 		oldX = camera.cameraPlane.x;
-		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
-		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) - camera.cameraPlane.y*cosf(ROT_SPEED);
+		camera.cameraPlane.x = camera.cameraPlane.x*cosf(-ROT_SPEED) - camera.cameraPlane.y*sinf(-ROT_SPEED);
+		camera.cameraPlane.y = oldX*sinf(-ROT_SPEED) + camera.cameraPlane.y*cosf(-ROT_SPEED);
 	default: break;
 	}
 
-	printf("x: %.2f y: %0.2f", camera.dir.x, camera.dir.y);
+	/* printf("x: %.2f y: %0.2f", camera.dir.x, camera.dir.y); */
 }
 
 void
