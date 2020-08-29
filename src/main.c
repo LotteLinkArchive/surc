@@ -76,14 +76,14 @@ init(SR_Canvas *canvas)
 	camera.cameraPlane.y = 0.66f;
 	camera.height = TILE_SIZE/2;
 
+	overlay = SR_NewCanvas(canvas->width/4, canvas->height/4);
+	if (!SR_CanvasIsValid(&overlay))
+		return 1;
+
 	if (!surc_scene_new(&scene, MAP_X, MAP_Y))
 		return 1;
 
 	surc_scene_load(&scene, map);
-
-	overlay = SR_NewCanvas(canvas->width/4, canvas->height/4);
-	if (!SR_CanvasIsValid(&overlay))
-		return 1;
 
 	updateOverlay(canvas);
 	return 0;
@@ -134,6 +134,7 @@ onKeyDown(SDL_KeyCode key)
 void
 clean()
 {
+	surc_scene_free(&scene);
 	SR_DestroyCanvas(&overlay);
 }
 
