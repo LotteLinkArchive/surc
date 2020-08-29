@@ -59,9 +59,9 @@ surc_raycast_until_collision(struct SurcVect2f *const hit,
 		if (surc_scene_get_tile(scene, map.x, map.y) > 0) {
 			hit->x = map.x;
 			hit->y = map.y;
-			return 0;
+			return 1;
 		}
 	}
 
-	return 1;
+	return 0;
 }
