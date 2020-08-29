@@ -10,6 +10,7 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+#define CAMERA_SIZE 8
 #define TILE_SIZE 64
 #define OVERLAY_TILE_SIZE 16
 
@@ -23,37 +24,21 @@ const uint8_t map[] = {
 	1, 1, 1, 1, 1
 };
 
-#define MOVE_SPEED 1
-#define ROT_SPEED 3
+#define MOVE_SPEED 0.1
+#define ROT_SPEED 0.1
 
 SR_Canvas overlay; /* Overlay canvas to draw 2d representation */
 
 struct SurcCamera camera;
 struct SurcScene scene; /* Test scene */
 
-int
-init(SR_Canvas *canvas)
+void
+updateOverlay(SR_Canvas *canvas)
 {
 	SR_RGBAPixel color;
 	uint8_t x, y;
 
-	/* Init camera */
-	camera.pos.x = MAP_X/2;
-	camera.pos.y = MAP_Y/2;
-	camera.dir.x = 1;
-	camera.cameraPlane.y = 0.66f;
-	camera.height = TILE_SIZE;
-
-	overlay = SR_NewCanvas(canvas->width, canvas->height);
-	if (!SR_CanvasIsValid(&overlay))
-		return 1;
-
-	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width/4, overlay.height/4);
-
-	if (!surc_scene_new(&scene, MAP_X, MAP_Y))
-		return 1;
-
-	surc_scene_load(&scene, map);
+	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width, overlay.height);
 	for (y = 0; y < scene.height; ++y)
 	for (x = 0; x < scene.width; ++x)
 	{
@@ -67,7 +52,33 @@ init(SR_Canvas *canvas)
 
 		SR_DrawRect(&overlay, color, x*OVERLAY_TILE_SIZE, y*OVERLAY_TILE_SIZE, OVERLAY_TILE_SIZE, OVERLAY_TILE_SIZE);
 	}
+
+	/* Camera */
+	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), (camera.pos.x - CAMERA_SIZE/2)*OVERLAY_TILE_SIZE, (camera.pos.y - CAMERA_SIZE/2)*OVERLAY_TILE_SIZE, CAMERA_SIZE/2, CAMERA_SIZE/2);
+
 	SR_MergeCanvasIntoCanvas(canvas, &overlay, 0, 0, 255, SR_BLEND_REPLACE);
+}
+
+int
+init(SR_Canvas *canvas)
+{
+	/* Init camera */
+	camera.pos.x = MAP_X;
+	camera.pos.y = MAP_Y;
+	camera.dir.x = 1;
+	camera.cameraPlane.y = 0.66f;
+	camera.height = TILE_SIZE;
+
+	if (!surc_scene_new(&scene, MAP_X, MAP_Y))
+		return 1;
+
+	surc_scene_load(&scene, map);
+
+	overlay = SR_NewCanvas(canvas->width/4, canvas->height/4);
+	if (!SR_CanvasIsValid(&overlay))
+		return 1;
+
+	updateOverlay(canvas);
 	return 0;
 }
 
@@ -75,8 +86,7 @@ int
 update(SR_Canvas *canvas)
 {
 	/* Player */
-	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), camera.pos.x, camera.pos.y, 10, 10);
-	SR_MergeCanvasIntoCanvas(canvas, &overlay, 0, 0, 255, SR_BLEND_REPLACE);
+	updateOverlay(canvas);
 	return 0;
 }
 
@@ -97,21 +107,23 @@ onKeyDown(SDL_KeyCode key)
 		break;
 	case SDLK_LEFT:
 		oldX = camera.dir.x;
-		camera.dir.x = camera.dir.x*cos(-ROT_SPEED) - camera.dir.y*sin(-ROT_SPEED);
-		camera.dir.y = oldX*sin(-ROT_SPEED) - camera.dir.y*cos(-ROT_SPEED);
+		camera.dir.x = camera.dir.x*cosf(-ROT_SPEED) - camera.dir.y*sinf(-ROT_SPEED);
+		camera.dir.y = oldX*sinf(-ROT_SPEED) - camera.dir.y*cosf(-ROT_SPEED);
 		oldX = camera.cameraPlane.x;
-		camera.cameraPlane.x = camera.cameraPlane.x*cos(-ROT_SPEED) - camera.cameraPlane.y*sin(-ROT_SPEED);
-		camera.cameraPlane.y = oldX*sin(-ROT_SPEED) - camera.cameraPlane.y*cos(-ROT_SPEED);
+		camera.cameraPlane.x = camera.cameraPlane.x*cosf(-ROT_SPEED) - camera.cameraPlane.y*sinf(-ROT_SPEED);
+		camera.cameraPlane.y = oldX*sinf(-ROT_SPEED) - camera.cameraPlane.y*cosf(-ROT_SPEED);
 		break;
 	case SDLK_RIGHT:
 		oldX = camera.dir.x;
-		camera.dir.x = camera.dir.x*cos(ROT_SPEED) - camera.dir.y*sin(ROT_SPEED);
-		camera.dir.y = oldX*sin(ROT_SPEED) - camera.dir.y*cos(ROT_SPEED);
+		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
+		camera.dir.y = oldX*sinf(ROT_SPEED) - camera.dir.y*cosf(ROT_SPEED);
 		oldX = camera.cameraPlane.x;
-		camera.cameraPlane.x = camera.cameraPlane.x*cos(ROT_SPEED) - camera.cameraPlane.y*sin(ROT_SPEED);
-		camera.cameraPlane.y = oldX*sin(ROT_SPEED) - camera.cameraPlane.y*cos(ROT_SPEED);
+		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
+		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) - camera.cameraPlane.y*cosf(ROT_SPEED);
 	default: break;
 	}
+
+	printf("x: %.2f y: %0.2f", camera.dir.x, camera.dir.y);
 }
 
 void
