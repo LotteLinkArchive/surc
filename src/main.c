@@ -17,14 +17,19 @@
 #define TILE_SIZE 64
 #define OVERLAY_TILE_SIZE 16
 
-#define MAP_X 5
-#define MAP_Y 5
+#define MAP_X 10
+#define MAP_Y 10
 const uint8_t map[] = {
-	1, 1, 1, 1, 1,
-	1, 0, 0, 0, 1,
-	1, 0, 1, 0, 1,
-	1, 0, 0, 0, 1,
-	1, 1, 1, 1, 1
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+	1, 0, 1, 0, 1, 0, 0, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 
 #define MOVE_SPEED 0.1
@@ -64,7 +69,7 @@ updateOverlay(SR_Canvas *canvas)
 	overlayPos.y = camera.pos.y*OVERLAY_TILE_SIZE;
 
 	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), overlayPos.x - CAMERA_SIZE/2, overlayPos.y - CAMERA_SIZE/2, CAMERA_SIZE, CAMERA_SIZE);
-	/* SR_DrawLine(&overlay, SR_CreateRGBA(100, 0, 100, 255), overlayPos.x, overlayPos.y, overlayPos.x + camera.dir.x*DIR_VECTOR_LEN, overlayPos.y + camera.dir.y*DIR_VECTOR_LEN); */
+	SR_DrawLine(&overlay, SR_CreateRGBA(100, 0, 100, 255), overlayPos.x, overlayPos.y, overlayPos.x + camera.dir.x*DIR_VECTOR_LEN, overlayPos.y + camera.dir.y*DIR_VECTOR_LEN);
 
 	/* Ray test */
 	if (surc_raycast_until_collision(&rayHit, camera.pos, camera.dir, &scene))
@@ -77,13 +82,13 @@ int
 init(SR_Canvas *canvas)
 {
 	/* Init camera */
-	camera.pos.x = MAP_X;
-	camera.pos.y = MAP_Y;
+	camera.pos.x = MAP_X/2;
+	camera.pos.y = MAP_Y/2;
 	camera.dir.x = 1;
 	camera.cameraPlane.y = 0.66f;
 	camera.height = TILE_SIZE/2;
 
-	overlay = SR_NewCanvas(canvas->width/4, canvas->height/4);
+	overlay = SR_NewCanvas(MAP_X*OVERLAY_TILE_SIZE, MAP_Y*OVERLAY_TILE_SIZE);
 	if (!SR_CanvasIsValid(&overlay))
 		return 1;
 
