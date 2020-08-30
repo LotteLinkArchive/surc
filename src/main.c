@@ -47,8 +47,6 @@ updateOverlay(SR_Canvas *canvas)
 	uint8_t x, y;
 	struct SurcVect2f overlayPos;
 
-	struct SurcVect2f rayHit;
-
 	SR_DrawRect(&overlay, SR_CreateRGBA(255, 255, 255, 255), 0, 0, overlay.width, overlay.height);
 	for (y = 0; y < scene.height; ++y)
 	for (x = 0; x < scene.width; ++x)
@@ -70,10 +68,6 @@ updateOverlay(SR_Canvas *canvas)
 
 	SR_DrawRect(&overlay, SR_CreateRGBA(100, 0, 0, 255), overlayPos.x - CAMERA_SIZE/2, overlayPos.y - CAMERA_SIZE/2, CAMERA_SIZE, CAMERA_SIZE);
 	SR_DrawLine(&overlay, SR_CreateRGBA(100, 0, 100, 255), overlayPos.x, overlayPos.y, overlayPos.x + camera.dir.x*DIR_VECTOR_LEN, overlayPos.y + camera.dir.y*DIR_VECTOR_LEN);
-
-	/* Ray test */
-	if (surc_raycast_until_collision(&rayHit, camera.pos, camera.dir, &scene))
-		SR_DrawLine(&overlay, SR_CreateRGBA(200, 100, 0, 255), overlayPos.x, overlayPos.y, rayHit.x*OVERLAY_TILE_SIZE, rayHit.y*OVERLAY_TILE_SIZE);
 
 	SR_MergeCanvasIntoCanvas(canvas, &overlay, 0, 0, 255, SR_BLEND_REPLACE);
 }
