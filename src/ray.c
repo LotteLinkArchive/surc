@@ -12,15 +12,15 @@
 #include "ray.h"
 #include "scene.h"
 
-float
+struct SurcRayHitInfo
 surc_raycast_until_collision(const struct SurcVect2f pos,
                              const struct SurcVect2f rayDir,
                              struct SurcScene *const scene)
 {
-	/* TODO: Bounds checks */
 	struct SurcVect2i map, step;
 	struct SurcVect2f sideDist, deltaDist;
-	bool isNS;
+
+	struct SurcRayHitInfo hitInfo;
 
 	map.x = (int)pos.x;
 	map.y = (int)pos.y;
@@ -51,18 +51,20 @@ surc_raycast_until_collision(const struct SurcVect2f pos,
 		if (sideDist.x < sideDist.y) {
 			sideDist.x += deltaDist.x;
 			map.x += step.x;
-			isNS = 1;
+			hitInfo.isNS = true;
 		} else {
 			sideDist.y += deltaDist.y;
 			map.y += step.y;
-			isNS = 0;
+			hitInfo.isNS = false;
 		}
 
 		if (surc_scene_get_tile(scene, map.x, map.y) > 0) {
-			if (isNS)
-				return (map.x - pos.x + (1 - step.x)/2)/rayDir.x;
+			if (hitInfo.isNS)
+				hitInfo.dist = (map.x - pos.x + (1 - step.x)/2)/rayDir.x;
 			else
-				return (map.y - pos.y + (1 - step.y)/2)/rayDir.y;
+				hitInfo.dist = (map.y - pos.y + (1 - step.y)/2)/rayDir.y;
+
+			return hitInfo;
 		}
 	}
 }
