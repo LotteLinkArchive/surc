@@ -67,6 +67,7 @@ int
 update(SR_Canvas *canvas)
 {
 	/* render frame */
+	SR_DrawRect(&frame, SR_CreateRGBA(0, 0, 0, 255), 0, 0, frame.width, frame.height);
 	surc_render_frame(&frame, &scene, &camera);
 	SR_MergeCanvasIntoCanvas(canvas, &frame, 0, 0, 255, SR_BLEND_REPLACE);
 
