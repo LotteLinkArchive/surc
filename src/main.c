@@ -9,8 +9,8 @@
 #include "render.h"
 #include "scene.h"
 
-#define WIDTH 1280
-#define HEIGHT 720
+#define WIDTH 800
+#define HEIGHT 600
 
 #define TILE_SIZE 64
 
@@ -30,7 +30,7 @@ const uint8_t map[] = {
 };
 
 #define MOVE_SPEED 0.1
-#define ROT_SPEED 0.5
+#define ROT_SPEED 0.25
 
 SR_Canvas overlay; /* Overlay canvas to draw 2d representation */
 SR_Canvas frame; /* Raycast render */
