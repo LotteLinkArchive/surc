@@ -46,7 +46,7 @@ init(SR_Canvas *canvas)
 	camera.pos.y = MAP_Y/2;
 	camera.dir.x = 1;
 	camera.cameraPlane.y = 0.66f;
-	camera.height = TILE_SIZE/2;
+	camera.height = TILE_SIZE;
 
 	overlay = SR_NewCanvas(MAP_X*OVERLAY_TILE_SIZE, MAP_Y*OVERLAY_TILE_SIZE);
 	if (!SR_CanvasIsValid(&overlay))
@@ -93,19 +93,19 @@ onKeyDown(SDL_KeyCode key)
 	}
 	if (key == SDLK_LEFT) {
 		oldX = camera.dir.x;
-		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
-		camera.dir.y = oldX*sinf(ROT_SPEED) + camera.dir.y*cosf(ROT_SPEED);
-		oldX = camera.cameraPlane.x;
-		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
-		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) + camera.cameraPlane.y*cosf(ROT_SPEED);
-	}
-	if (key == SDLK_RIGHT) {
-		oldX = camera.dir.x;
 		camera.dir.x = camera.dir.x*cosf(-ROT_SPEED) - camera.dir.y*sinf(-ROT_SPEED);
 		camera.dir.y = oldX*sinf(-ROT_SPEED) + camera.dir.y*cosf(-ROT_SPEED);
 		oldX = camera.cameraPlane.x;
 		camera.cameraPlane.x = camera.cameraPlane.x*cosf(-ROT_SPEED) - camera.cameraPlane.y*sinf(-ROT_SPEED);
 		camera.cameraPlane.y = oldX*sinf(-ROT_SPEED) + camera.cameraPlane.y*cosf(-ROT_SPEED);
+	}
+	if (key == SDLK_RIGHT) {
+		oldX = camera.dir.x;
+		camera.dir.x = camera.dir.x*cosf(ROT_SPEED) - camera.dir.y*sinf(ROT_SPEED);
+		camera.dir.y = oldX*sinf(ROT_SPEED) + camera.dir.y*cosf(ROT_SPEED);
+		oldX = camera.cameraPlane.x;
+		camera.cameraPlane.x = camera.cameraPlane.x*cosf(ROT_SPEED) - camera.cameraPlane.y*sinf(ROT_SPEED);
+		camera.cameraPlane.y = oldX*sinf(ROT_SPEED) + camera.cameraPlane.y*cosf(ROT_SPEED);
 	}
 
 	/* printf("x: %.2f y: %0.2f", camera.dir.x, camera.dir.y); */
