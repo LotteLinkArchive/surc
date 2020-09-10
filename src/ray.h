@@ -7,6 +7,7 @@
 #include "scene.h"
 
 struct SurcRayHitInfo {
+	struct SurcVect2i map;
 	float dist;
 	bool isNS; /* else EW hit */
 };

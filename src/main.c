@@ -56,7 +56,7 @@ init(SR_Canvas *canvas)
 	if (!SR_CanvasIsValid(&frame))
 		return 1;
 
-	if (!surc_scene_new(&scene, MAP_X, MAP_Y))
+	if (!surc_scene_new(&scene, MAP_X, MAP_Y, 2))
 		return 1;
 
 	surc_scene_load(&scene, map);

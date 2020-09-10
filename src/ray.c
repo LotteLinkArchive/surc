@@ -17,13 +17,13 @@ surc_raycast_until_collision(const struct SurcVect2f pos,
                              const struct SurcVect2f rayDir,
                              struct SurcScene *const scene)
 {
-	struct SurcVect2i map, step;
+	struct SurcVect2i step;
 	struct SurcVect2f sideDist, deltaDist;
 
 	struct SurcRayHitInfo hitInfo;
 
-	map.x = (int)pos.x;
-	map.y = (int)pos.y;
+	hitInfo.map.x = (int)pos.x;
+	hitInfo.map.y = (int)pos.y;
 
 	/* Calculate deltas */
 	deltaDist.x = fabsf(1/rayDir.x);
@@ -32,37 +32,37 @@ surc_raycast_until_collision(const struct SurcVect2f pos,
 	/* step and sideDists (offsets) */
 	if (rayDir.x < 0) {
 		step.x = -1;
-		sideDist.x = (pos.x - map.x)*deltaDist.x;
+		sideDist.x = (pos.x - hitInfo.map.x)*deltaDist.x;
 	} else {
 		step.x = 1;
-		sideDist.x = (map.x + 1 - pos.x)*deltaDist.x;
+		sideDist.x = (hitInfo.map.x + 1 - pos.x)*deltaDist.x;
 	}
 
 	if (rayDir.y < 0) {
 		step.y = -1;
-		sideDist.y = (pos.y - map.y)*deltaDist.y;
+		sideDist.y = (pos.y - hitInfo.map.y)*deltaDist.y;
 	} else {
 		step.y = 1;
-		sideDist.y = (map.y + 1 - pos.y)*deltaDist.y;
+		sideDist.y = (hitInfo.map.y + 1 - pos.y)*deltaDist.y;
 	}
 
 	/* DDA */
 	for (;;) {
 		if (sideDist.x < sideDist.y) {
 			sideDist.x += deltaDist.x;
-			map.x += step.x;
+			hitInfo.map.x += step.x;
 			hitInfo.isNS = true;
 		} else {
 			sideDist.y += deltaDist.y;
-			map.y += step.y;
+			hitInfo.map.y += step.y;
 			hitInfo.isNS = false;
 		}
 
-		if (surc_scene_get_tile(scene, map.x, map.y) > 0) {
+		if (surc_scene_get_tile(scene, hitInfo.map.x, hitInfo.map.y) > 0) {
 			if (hitInfo.isNS)
-				hitInfo.dist = (map.x - pos.x + (1 - step.x)/2)/rayDir.x;
+				hitInfo.dist = (hitInfo.map.x - pos.x + (1 - step.x)/2)/rayDir.x;
 			else
-				hitInfo.dist = (map.y - pos.y + (1 - step.y)/2)/rayDir.y;
+				hitInfo.dist = (hitInfo.map.y - pos.y + (1 - step.y)/2)/rayDir.y;
 
 			return hitInfo;
 		}
