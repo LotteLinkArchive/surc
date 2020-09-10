@@ -11,6 +11,7 @@ surc_render_frame(SR_Canvas *canvas,
 {
 	int lineHeight, lineStart, lineEnd;
 	float cameraX;
+	SR_Canvas texture;
 	SR_RGBAPixel color;
 	struct SurcVect2f rayDir;
 	struct SurcRayHitInfo hitInfo;
@@ -34,7 +35,8 @@ surc_render_frame(SR_Canvas *canvas,
 		if (lineEnd >= canvas->height)
 			lineEnd = canvas->height - 1;
 
-		if (!surc_scene_get_texture(scene, hitInfo.map.x, hitInfo.map.y).pixels) {
+		texture = surc_scene_get_texture(scene, hitInfo.map.x, hitInfo.map.y);
+		if (!SR_CanvasIsValid(&texture)) {
 			color = hitInfo.isNS ? SR_CreateRGBA(255, 255, 255, 255) : SR_CreateRGBA(200, 200, 200, 255);
 
 			SR_DrawRect(canvas, color, i, lineStart, 1, lineEnd - lineStart);
