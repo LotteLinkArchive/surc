@@ -14,6 +14,7 @@ struct SurcScene {
 	uint8_t *map;
 
 	/* Texture map */
+	int tileSize;
 	SR_Canvas *textures;
 	size_t numTiles;
 };

@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "ray.h"
 #include "scene.h"
+#include <math.h>
 
 void
 surc_render_frame(SR_Canvas *canvas,
@@ -10,7 +11,8 @@ surc_render_frame(SR_Canvas *canvas,
                   struct SurcCamera *const camera)
 {
 	int lineHeight, lineStart, lineEnd;
-	float cameraX;
+	int texX;
+	float cameraX, wallX;
 	SR_Canvas texture;
 	SR_RGBAPixel color;
 	struct SurcVect2f rayDir;
@@ -37,10 +39,20 @@ surc_render_frame(SR_Canvas *canvas,
 
 		texture = surc_scene_get_texture(scene, hitInfo.map.x, hitInfo.map.y);
 		if (!SR_CanvasIsValid(&texture)) {
+			/* Basic color draw */
 			color = hitInfo.isNS ? SR_CreateRGBA(255, 255, 255, 255) : SR_CreateRGBA(200, 200, 200, 255);
-
 			SR_DrawRect(canvas, color, i, lineStart, 1, lineEnd - lineStart);
+			continue;
 		}
+
+		/* Calculate wall x */
+		wallX = hitInfo.isNS ? camera->pos.y + hitInfo.dist*rayDir.y : camera->pos.x + hitInfo.dist*rayDir.x;
+		wallX = modff(wallX, NULL);
+
+		/* Texture x */
+		texX = wallX*scene->tileSize;
+		if ((hitInfo.isNS && rayDir.x > 0) || (hitInfo.isNS != 1 && rayDir.y < 0))
+			texX = scene->tileSize - texX - 1;
 	}
 }
 
